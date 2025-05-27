@@ -1,4 +1,4 @@
-package com.lawis.springcloud.api.gateway;
+package com.lawis.springcloud.app.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
