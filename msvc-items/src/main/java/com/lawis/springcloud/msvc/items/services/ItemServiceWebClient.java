@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient.Builder;
 import com.lawis.springcloud.msvc.items.models.Item;
 import com.lawis.springcloud.msvc.items.models.Product;
 
-// @Primary
+@Primary
 @Service
 public class ItemServiceWebClient implements ItemService {
 
@@ -42,18 +43,18 @@ public class ItemServiceWebClient implements ItemService {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
 
-        try {
-            return Optional.ofNullable(client.build()
-                    .get()
-                    .uri("/{id}", params)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .bodyToMono(Product.class)
-                    .map(product -> new Item(product, new Random().nextInt(0, 10) + 1))
-                    .block());
-        } catch (WebClientResponseException e) {
-            return Optional.empty();
-        }
+        // try {
+        return Optional.ofNullable(client.build()
+                .get()
+                .uri("/{id}", params)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .map(product -> new Item(product, new Random().nextInt(0, 10) + 1))
+                .block());
+        // } catch (WebClientResponseException e) {
+        // return Optional.empty();
+        // }
     }
 
 }
