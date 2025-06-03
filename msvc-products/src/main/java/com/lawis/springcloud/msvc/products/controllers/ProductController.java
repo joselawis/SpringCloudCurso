@@ -36,7 +36,7 @@ public class ProductController {
             throw new IllegalStateException("Invalid product ID: " + id);
         }
         if (Long.valueOf(7).equals(id)) {
-            TimeUnit.SECONDS.sleep(5L);
+            TimeUnit.SECONDS.sleep(3L);
         }
 
         Optional<Product> productOptional = service.findById(id);
