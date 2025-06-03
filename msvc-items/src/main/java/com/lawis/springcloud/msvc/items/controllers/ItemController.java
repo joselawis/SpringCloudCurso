@@ -82,7 +82,8 @@ public class ItemController {
                 .body(Collections.singletonMap("message", "Product doesn't exist in msvc-product"));
     }
 
-    @TimeLimiter(name = "items", fallbackMethod = "getFallbackMethodProduct2")
+    @CircuitBreaker(name = "items", fallbackMethod = "getFallbackMethodProduct2")
+    @TimeLimiter(name = "items")
     @GetMapping("/details3/{id}")
     public CompletableFuture<?> details3(@PathVariable Long id) {
         return CompletableFuture.supplyAsync(() -> {
