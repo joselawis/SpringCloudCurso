@@ -6,20 +6,20 @@ import com.lawis.springcloud.msvc.items.models.Item;
 import com.lawis.springcloud.msvc.items.models.Product;
 import com.lawis.springcloud.msvc.items.services.ItemService;
 
-import feign.Response;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +34,23 @@ public class ItemController {
     private final ItemService service;
     private final CircuitBreakerFactory cBreakerFactory;
 
+    @Value("${configuration.text}")
+    private String text;
+
     public ItemController(@Qualifier("itemServiceWebClient") ItemService service,
             CircuitBreakerFactory cBreakerFactory) {
         this.service = service;
         this.cBreakerFactory = cBreakerFactory;
+    }
+
+    @GetMapping("/fetch-configs")
+    public ResponseEntity<?> fetchConfigs(@Value("${server.port}") String port) {
+        Map<String, String> configs = Map.of(
+                "text", text,
+                "port", port);
+        logger.info(port);
+        logger.info(text);
+        return ResponseEntity.ok(configs);
     }
 
     @GetMapping
