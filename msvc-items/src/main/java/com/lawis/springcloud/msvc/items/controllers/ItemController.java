@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.cloud.client.circuitbreaker.ConfigBuilder;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class ItemController {
 
     private final Logger logger = LoggerFactory.getLogger(ItemController.class);
     private final ItemService service;
-    private final CircuitBreakerFactory cBreakerFactory;
+    private final CircuitBreakerFactory<Object, ConfigBuilder<Object>> cBreakerFactory;
 
     @Value("${configuration.text}")
     private String text;
@@ -46,7 +47,7 @@ public class ItemController {
     private Environment env;
 
     public ItemController(@Qualifier("itemServiceWebClient") ItemService service,
-            CircuitBreakerFactory cBreakerFactory) {
+            CircuitBreakerFactory<Object, ConfigBuilder<Object>> cBreakerFactory) {
         this.service = service;
         this.cBreakerFactory = cBreakerFactory;
     }
