@@ -11,6 +11,7 @@ import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,15 +19,19 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@RefreshScope
 @RestController
 public class ItemController {
 
@@ -37,6 +42,9 @@ public class ItemController {
     @Value("${configuration.text}")
     private String text;
 
+    @Autowired
+    private Environment env;
+
     public ItemController(@Qualifier("itemServiceWebClient") ItemService service,
             CircuitBreakerFactory cBreakerFactory) {
         this.service = service;
@@ -45,11 +53,16 @@ public class ItemController {
 
     @GetMapping("/fetch-configs")
     public ResponseEntity<?> fetchConfigs(@Value("${server.port}") String port) {
-        Map<String, String> configs = Map.of(
-                "text", text,
-                "port", port);
+        Map<String, String> configs = new HashMap<>();
+        configs.put("text", text);
+        configs.put("port", port);
         logger.info(port);
         logger.info(text);
+
+        if (env.getActiveProfiles().length > 0 && env.getActiveProfiles()[0].equals("dev")) {
+            configs.put("author.name", env.getProperty("configuration.author.name", "Default Author"));
+            configs.put("author.email", env.getProperty("configuration.author.email", "Default Email"));
+        }
         return ResponseEntity.ok(configs);
     }
 
