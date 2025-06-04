@@ -2,7 +2,6 @@ package com.lawis.springcloud.msvc.items;
 
 import java.time.Duration;
 
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreaker;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
 import org.springframework.cloud.client.circuitbreaker.Customizer;
