@@ -43,20 +43,24 @@ public class ItemServiceFeign implements ItemService {
 
     @Override
     public Product save(Product product) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        return client.save(product);
     }
 
     @Override
     public Product update(Product product, Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        try {
+            return client.update(product, id);
+        } catch (FeignException e) {
+            return null;
+        }
     }
 
     @Override
     public void delete(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        try {
+            client.delete(id);
+        } catch (FeignException e) {
+        }
     }
 
 }
