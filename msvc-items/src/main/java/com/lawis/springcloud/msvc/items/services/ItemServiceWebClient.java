@@ -1,6 +1,5 @@
 package com.lawis.springcloud.msvc.items.services;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,8 +38,7 @@ public class ItemServiceWebClient implements ItemService {
 
     @Override
     public Optional<Item> findById(Long id) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
+        Map<String, Object> params = Map.of("id", id);
 
         // try {
         return Optional.ofNullable(client.build()
@@ -54,6 +52,46 @@ public class ItemServiceWebClient implements ItemService {
         // } catch (WebClientResponseException e) {
         // return Optional.empty();
         // }
+    }
+
+    @Override
+    public Product save(Product product) {
+        return client.build()
+                .post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+    }
+
+    @Override
+    public Product update(Product product, Long id) {
+        Map<String, Object> params = Map.of("id", id);
+
+        return client.build()
+                .put()
+                .uri("/{id}", params)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .block();
+    }
+
+    @Override
+    public void delete(Long id) {
+        Map<String, Object> params = Map.of("id", id);
+
+        client.build()
+                .delete()
+                .uri("/{id}", params)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
 }
