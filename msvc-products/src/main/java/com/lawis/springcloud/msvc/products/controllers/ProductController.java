@@ -2,7 +2,7 @@ package com.lawis.springcloud.msvc.products.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lawis.springcloud.msvc.products.entities.Product;
+import com.lawis.libs.msvc.commons.entities.Product;
 import com.lawis.springcloud.msvc.products.services.ProductService;
 
 import java.util.List;

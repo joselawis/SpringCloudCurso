@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lawis.libs.msvc.commons.entities.Product;
 import com.lawis.springcloud.msvc.items.models.Item;
-import com.lawis.springcloud.msvc.items.models.Product;
 import com.lawis.springcloud.msvc.items.services.ItemService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -90,7 +90,7 @@ public class ItemController {
                     product.setId(1L);
                     product.setName("Default Product");
                     product.setPrice(100.0);
-                    product.setCreatedAt(LocalDate.now());
+                    product.setCreateAt(LocalDate.now());
                     return Optional.of(new Item(product, 5));
                 });
         if (itemOptional.isPresent()) {
@@ -135,7 +135,7 @@ public class ItemController {
         product.setId(1L);
         product.setName("Default Product");
         product.setPrice(100.0);
-        product.setCreatedAt(LocalDate.now());
+        product.setCreateAt(LocalDate.now());
         return ResponseEntity.ok(new Item(product, 5));
     }
 
@@ -147,7 +147,7 @@ public class ItemController {
             product.setId(1L);
             product.setName("Default Product");
             product.setPrice(100.0);
-            product.setCreatedAt(LocalDate.now());
+            product.setCreateAt(LocalDate.now());
             return ResponseEntity.ok(new Item(product, 5));
         });
     }

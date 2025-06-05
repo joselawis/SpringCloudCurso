@@ -3,7 +3,7 @@ package com.lawis.springcloud.msvc.products.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.lawis.springcloud.msvc.products.entities.Product;
+import com.lawis.libs.msvc.commons.entities.Product;
 
 public interface ProductService {
 

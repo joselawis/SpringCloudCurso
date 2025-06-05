@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.Builder;
 
+import com.lawis.libs.msvc.commons.entities.Product;
 import com.lawis.springcloud.msvc.items.models.Item;
-import com.lawis.springcloud.msvc.items.models.Product;
 
 @Primary
 @Service
