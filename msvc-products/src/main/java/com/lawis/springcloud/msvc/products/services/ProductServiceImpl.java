@@ -38,4 +38,16 @@ public class ProductServiceImpl implements ProductService {
         });
     }
 
+    @Override
+    @Transactional
+    public Product save(Product product) {
+        return repository.save(product);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        repository.deleteById(id);
+    }
+
 }
