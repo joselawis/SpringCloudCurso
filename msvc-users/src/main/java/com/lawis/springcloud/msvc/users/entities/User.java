@@ -26,7 +26,7 @@ public class User {
     @NotBlank
     private String password;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     @Email
     @NotBlank

@@ -2,6 +2,7 @@ package com.lawis.springcloud.msvc.users.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,22 +21,28 @@ public class UserController {
 
     private final IUserService userService;
 
-    public UserController(IUserService userService) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserController(IUserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> putMethodName(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
         return userService.findById(id)
                 .map(existingUser -> {
                     existingUser.setUsername(user.getUsername());
                     existingUser.setEmail(user.getEmail());
-                    existingUser.setEnabled(user.isEnabled());
+                    if (user.getEnabled() != null) {
+                        existingUser.setEnabled(user.getEnabled());
+                    }
                     return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(existingUser));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
