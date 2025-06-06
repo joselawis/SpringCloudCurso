@@ -1,6 +1,5 @@
 package com.lawis.springcloud.msvc.users.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -38,8 +37,8 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> findAll() {
-        return (List<User>) userRepository.findAll();
+    public Iterable<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
