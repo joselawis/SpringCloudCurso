@@ -55,8 +55,11 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public User save(User user) {
-        user.setRoles(getDefaultRoles());
+        user.setRoles(getRoles(user));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getEnabled() == null) {
+            user.setEnabled(true);
+        }
         return userRepository.save(user);
     }
 
@@ -67,10 +70,13 @@ public class UserService implements IUserService {
                 .map(existingUser -> {
                     existingUser.setUsername(user.getUsername());
                     existingUser.setEmail(user.getEmail());
+                    existingUser.setAdmin(user.isAdmin());
                     if (user.getEnabled() != null) {
                         existingUser.setEnabled(user.getEnabled());
+                    } else {
+                        existingUser.setEnabled(true);
                     }
-                    existingUser.setRoles(getDefaultRoles());
+                    existingUser.setRoles(getRoles(user));
 
                     return userRepository.save(existingUser);
                 });
@@ -82,10 +88,15 @@ public class UserService implements IUserService {
         userRepository.deleteById(id);
     }
 
-    private List<Role> getDefaultRoles() {
+    private List<Role> getRoles(User user) {
         List<Role> roles = new ArrayList<>();
         Optional<Role> roleOptional = roleRepository.findByName("ROLE_USER");
         roleOptional.ifPresent(roles::add);
+
+        if (user.isAdmin()) {
+            Optional<Role> adminRoleOptional = roleRepository.findByName("ROLE_ADMIN");
+            adminRoleOptional.ifPresent(roles::add);
+        }
         return roles;
     }
 }
