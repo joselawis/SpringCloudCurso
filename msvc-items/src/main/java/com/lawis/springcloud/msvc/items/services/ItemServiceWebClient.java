@@ -18,7 +18,11 @@ import com.lawis.springcloud.msvc.items.models.Item;
 @Service
 public class ItemServiceWebClient implements ItemService {
 
+    private static final String PATH_VARIABLE_ID = "/{id}";
+
     private final WebClient.Builder client;
+
+    private Random random = new Random();
 
     public ItemServiceWebClient(Builder client) {
         this.client = client;
@@ -31,7 +35,7 @@ public class ItemServiceWebClient implements ItemService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToFlux(Product.class)
-                .map(product -> new Item(product, new Random().nextInt(0, 10) + 1))
+                .map(product -> new Item(product, random.nextInt(0, 10) + 1))
                 .collectList()
                 .block();
     }
@@ -40,18 +44,14 @@ public class ItemServiceWebClient implements ItemService {
     public Optional<Item> findById(Long id) {
         Map<String, Object> params = Map.of("id", id);
 
-        // try {
         return Optional.ofNullable(client.build()
                 .get()
-                .uri("/{id}", params)
+                .uri(PATH_VARIABLE_ID, params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Product.class)
-                .map(product -> new Item(product, new Random().nextInt(0, 10) + 1))
+                .map(product -> new Item(product, random.nextInt(0, 10) + 1))
                 .block());
-        // } catch (WebClientResponseException e) {
-        // return Optional.empty();
-        // }
     }
 
     @Override
@@ -67,30 +67,30 @@ public class ItemServiceWebClient implements ItemService {
     }
 
     @Override
-    public Product update(Product product, Long id) {
+    public Optional<Product> update(Product product, Long id) {
         Map<String, Object> params = Map.of("id", id);
 
-        return client.build()
+        return Optional.ofNullable(client.build()
                 .put()
-                .uri("/{id}", params)
+                .uri(PATH_VARIABLE_ID, params)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(product)
                 .retrieve()
                 .bodyToMono(Product.class)
-                .block();
+                .block());
     }
 
     @Override
-    public void delete(Long id) {
+    public Boolean delete(Long id) {
         Map<String, Object> params = Map.of("id", id);
 
-        client.build()
+        return client.build()
                 .delete()
-                .uri("/{id}", params)
+                .uri(PATH_VARIABLE_ID, params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(Void.class)
+                .bodyToMono(Boolean.class)
                 .block();
     }
 

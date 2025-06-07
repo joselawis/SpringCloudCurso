@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lawis.libs.msvc.commons.entities.Product;
 import com.lawis.springcloud.msvc.products.services.ProductService;
 
+import jakarta.ws.rs.NotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping
 public class ProductController {
 
-    final private ProductService service;
+    private final ProductService service;
 
     public ProductController(ProductService service) {
         this.service = service;
@@ -35,20 +37,17 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> details(@PathVariable Long id) throws InterruptedException {
-
-        if (Long.valueOf(100).equals(id)) {
-            throw new IllegalStateException("Invalid product ID: " + id);
+    public ResponseEntity<Product> details(@PathVariable Long id) throws NotFoundException, InterruptedException {
+        if (id == 100L) {
+            throw new NotFoundException("Invalid product ID: " + id);
         }
-        if (Long.valueOf(7).equals(id)) {
+        if (id == 7L) {
             TimeUnit.SECONDS.sleep(3L);
         }
 
-        Optional<Product> productOptional = service.findById(id);
-        if (productOptional.isPresent()) {
-            return ResponseEntity.ok(productOptional.orElseThrow());
-        }
-        return ResponseEntity.notFound().build();
+        return service.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -58,27 +57,20 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Product product) {
-        Optional<Product> productOptional = service.findById(id);
-        if (productOptional.isPresent()) {
-            Product existingProduct = productOptional.orElseThrow();
-            existingProduct.setName(product.getName());
-            existingProduct.setPrice(product.getPrice());
-            existingProduct.setCreateAt(product.getCreateAt());
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(service.save(existingProduct));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
+        return service.update(id, product)
+                .map(updatedProduct -> ResponseEntity.status(HttpStatus.CREATED).body(updatedProduct))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
         Optional<Product> productOptional = service.findById(id);
         if (productOptional.isPresent()) {
             service.deleteById(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(true);
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
     }
 
 }

@@ -25,23 +25,39 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public List<Product> findAll() {
         return ((List<Product>) repository.findAll()).stream()
-                .peek(product -> product.setPort(Integer.parseInt(environment.getProperty("local.server.port"))))
+                .map(product -> {
+                    product.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
+                    return product;
+                })
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Product> findById(Long id) {
-        return repository.findById(id).map(product -> {
-            product.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
-            return product;
-        });
+        return repository.findById(id)
+                .map(product -> {
+                    product.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
+                    return product;
+                });
     }
 
     @Override
     @Transactional
     public Product save(Product product) {
         return repository.save(product);
+    }
+
+    @Override
+    @Transactional
+    public Optional<Product> update(Long id, Product product) {
+        return repository.findById(id)
+                .map(existingProduct -> {
+                    existingProduct.setName(product.getName());
+                    existingProduct.setPrice(product.getPrice());
+                    existingProduct.setCreateAt(product.getCreateAt());
+                    return repository.save(existingProduct);
+                });
     }
 
     @Override

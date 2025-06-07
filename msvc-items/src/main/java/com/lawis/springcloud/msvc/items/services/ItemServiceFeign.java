@@ -15,7 +15,9 @@ import feign.FeignException;
 @Service
 public class ItemServiceFeign implements ItemService {
 
-    final private ProductFeignClient client;
+    private final ProductFeignClient client;
+
+    private Random random = new Random();
 
     public ItemServiceFeign(ProductFeignClient client) {
         this.client = client;
@@ -24,21 +26,14 @@ public class ItemServiceFeign implements ItemService {
     @Override
     public List<Item> findAll() {
         return client.findAll().stream()
-                .map(product -> new Item(product, new Random().nextInt(0, 10) + 1))
+                .map(product -> new Item(product, random.nextInt(0, 10) + 1))
                 .toList();
     }
 
     @Override
     public Optional<Item> findById(Long id) {
-        try {
-            Product product = client.details(id);
-
-            return Optional.of(new Item(
-                    product,
-                    new Random().nextInt(0, 10) + 1));
-        } catch (FeignException e) {
-            return Optional.empty();
-        }
+        return client.details(id)
+                .map(product -> new Item(product, random.nextInt(0, 10) + 1));
     }
 
     @Override
@@ -47,19 +42,20 @@ public class ItemServiceFeign implements ItemService {
     }
 
     @Override
-    public Product update(Product product, Long id) {
+    public Optional<Product> update(Product product, Long id) {
         try {
             return client.update(product, id);
         } catch (FeignException e) {
-            return null;
+            return Optional.empty();
         }
     }
 
     @Override
-    public void delete(Long id) {
+    public Boolean delete(Long id) {
         try {
-            client.delete(id);
+            return client.delete(id);
         } catch (FeignException e) {
+            return false;
         }
     }
 

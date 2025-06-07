@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -42,22 +41,22 @@ public class ItemController {
 
     private final Logger logger = LoggerFactory.getLogger(ItemController.class);
     private final ItemService service;
-    private final CircuitBreakerFactory cBreakerFactory;
+    private final CircuitBreakerFactory<?, ?> cBreakerFactory;
 
     @Value("${configuration.text}")
     private String text;
 
-    @Autowired
-    private Environment env;
+    private final Environment env;
 
     public ItemController(@Qualifier("itemServiceFeign") ItemService service,
-            CircuitBreakerFactory cBreakerFactory) {
+            CircuitBreakerFactory<?, ?> cBreakerFactory, Environment env) {
         this.service = service;
         this.cBreakerFactory = cBreakerFactory;
+        this.env = env;
     }
 
     @GetMapping("/fetch-configs")
-    public ResponseEntity<?> fetchConfigs(@Value("${server.port}") String port) {
+    public ResponseEntity<Map<String, String>> fetchConfigs(@Value("${server.port}") String port) {
         Map<String, String> configs = new HashMap<>();
         configs.put("text", text);
         configs.put("port", port);
@@ -74,14 +73,13 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<Item>> list(@RequestParam(required = false) String name,
             @RequestHeader(name = "token-request", required = false) String token) {
-        System.out.println("Token from request header: " + token);
-        System.out.println("Name from request parameter: " + name);
+        logger.info("Token from request header: {}", token);
+        logger.info("Name from request parameter: {}", name);
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> details(@PathVariable Long id) {
-        // Optional<Item> itemOptional = service.findById(id);
         Optional<Item> itemOptional = cBreakerFactory.create("items").run(
                 () -> service.findById(id),
                 throwable -> {
@@ -154,20 +152,24 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Product create(@RequestBody Product product) {
-        return service.save(product);
+    public ResponseEntity<Product> create(@RequestBody Product product) {
+        return ResponseEntity.ok(service.save(product));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Product update(@RequestBody Product entity, @PathVariable Long id) {
-        return service.update(entity, id);
+    public ResponseEntity<Product> update(@RequestBody Product entity, @PathVariable Long id) {
+        return service.update(entity, id).map(
+                updatedProduct -> ResponseEntity.status(HttpStatus.CREATED).body(updatedProduct))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        return service.delete(id)
+                ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
 }

@@ -14,7 +14,7 @@ public interface ItemService {
 
     Product save(Product product);
 
-    Product update(Product product, Long id);
+    Optional<Product> update(Product product, Long id);
 
-    void delete(Long id);
+    Boolean delete(Long id);
 }

@@ -1,6 +1,7 @@
 package com.lawis.springcloud.msvc.items.clients;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,14 +20,14 @@ public interface ProductFeignClient {
     List<Product> findAll();
 
     @GetMapping("/{id}")
-    public Product details(@PathVariable Long id);
+    public Optional<Product> details(@PathVariable Long id);
 
     @PostMapping
     public Product save(@RequestBody Product product);
 
     @PutMapping("/{id}")
-    public Product update(@RequestBody Product product, @PathVariable Long id);
+    public Optional<Product> update(@RequestBody Product product, @PathVariable Long id);
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id);
+    public boolean delete(@PathVariable Long id);
 }
