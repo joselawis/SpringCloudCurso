@@ -1,4 +1,4 @@
-package com.lawis.springcloud.msvc.oauth.msvc_oauth;
+package com.lawis.springcloud.msvc.oauth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
