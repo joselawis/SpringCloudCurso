@@ -68,7 +68,7 @@ public class ProductController {
         Optional<Product> productOptional = service.findById(id);
         if (productOptional.isPresent()) {
             service.deleteById(id);
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok().body(true);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
     }
