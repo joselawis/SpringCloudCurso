@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lawis.libs.msvc.commons.entities.Product;
+import com.lawis.libs.msvc.commons.models.Product;
 import com.lawis.springcloud.msvc.items.models.Item;
 import com.lawis.springcloud.msvc.items.services.ItemService;
 
