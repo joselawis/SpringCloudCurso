@@ -1,4 +1,4 @@
-package com.lawis.libs.msvc.entities.entities.products;
+package com.lawis.libs.msvc.entities.products;
 
 import java.time.LocalDate;
 

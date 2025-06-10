@@ -1,4 +1,4 @@
-package com.lawis.libs.msvc.entities.entities.users;
+package com.lawis.libs.msvc.entities.users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

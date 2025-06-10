@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lawis.libs.msvc.commons.models.Product;
-import com.lawis.libs.msvc.entities.entities.products.ProductEntity;
+import com.lawis.libs.msvc.entities.products.ProductEntity;
 import com.lawis.springcloud.msvc.products.mappers.ProductMapper;
 import com.lawis.springcloud.msvc.products.repositories.ProductRepository;
 

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lawis.libs.msvc.commons.models.User;
-import com.lawis.libs.msvc.entities.entities.users.RoleEntity;
-import com.lawis.libs.msvc.entities.entities.users.UserEntity;
+import com.lawis.libs.msvc.entities.users.RoleEntity;
+import com.lawis.libs.msvc.entities.users.UserEntity;
 import com.lawis.springcloud.msvc.users.mappers.UserMapper;
 import com.lawis.springcloud.msvc.users.repositories.RoleRepository;
 import com.lawis.springcloud.msvc.users.repositories.UserRepository;

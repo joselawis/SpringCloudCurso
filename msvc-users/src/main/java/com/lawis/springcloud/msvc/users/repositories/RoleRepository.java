@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.lawis.libs.msvc.entities.entities.users.RoleEntity;
+import com.lawis.libs.msvc.entities.users.RoleEntity;
 
 public interface RoleRepository extends CrudRepository<RoleEntity, Long> {
 

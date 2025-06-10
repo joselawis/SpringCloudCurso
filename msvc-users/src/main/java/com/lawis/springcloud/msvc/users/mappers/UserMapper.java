@@ -3,7 +3,7 @@ package com.lawis.springcloud.msvc.users.mappers;
 import org.mapstruct.Mapper;
 
 import com.lawis.libs.msvc.commons.models.User;
-import com.lawis.libs.msvc.entities.entities.users.UserEntity;
+import com.lawis.libs.msvc.entities.users.UserEntity;
 
 @Mapper(componentModel = "spring", uses = RoleMapper.class)
 public interface UserMapper {

@@ -1,4 +1,4 @@
-package com.lawis.libs.msvc.entities.entities.users;
+package com.lawis.libs.msvc.entities.users;
 
 import java.util.List;
 
