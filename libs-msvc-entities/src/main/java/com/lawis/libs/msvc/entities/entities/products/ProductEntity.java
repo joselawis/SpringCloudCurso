@@ -1,4 +1,4 @@
-package com.lawis.libs.msvc.commons.entities;
+package com.lawis.libs.msvc.entities.entities.products;
 
 import java.time.LocalDate;
 
@@ -14,7 +14,7 @@ import lombok.Data;
 @Entity
 @Table(name = "products")
 @Data
-public class Product {
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
