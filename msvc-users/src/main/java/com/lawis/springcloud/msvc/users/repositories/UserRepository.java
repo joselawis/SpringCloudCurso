@@ -4,13 +4,13 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.lawis.springcloud.msvc.users.entities.User;
+import com.lawis.libs.msvc.entities.entities.users.UserEntity;
 
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
-    Optional<User> findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
-    Optional<User> findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
 
     boolean existsByUsername(String username);
 

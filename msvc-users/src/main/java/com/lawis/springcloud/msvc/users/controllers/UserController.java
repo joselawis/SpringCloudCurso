@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lawis.springcloud.msvc.users.entities.User;
+import com.lawis.libs.msvc.commons.models.User;
 import com.lawis.springcloud.msvc.users.services.IUserService;
 
 @RestController

@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.lawis.springcloud.msvc.users.entities.Role;
+import com.lawis.libs.msvc.entities.entities.users.RoleEntity;
 
-public interface RoleRepository extends CrudRepository<Role, Long> {
+public interface RoleRepository extends CrudRepository<RoleEntity, Long> {
 
-    Optional<Role> findByName(String name);
+    Optional<RoleEntity> findByName(String name);
 
 }

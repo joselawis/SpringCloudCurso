@@ -2,7 +2,7 @@ package com.lawis.springcloud.msvc.users.services;
 
 import java.util.Optional;
 
-import com.lawis.springcloud.msvc.users.entities.User;
+import com.lawis.libs.msvc.commons.models.User;
 
 public interface IUserService {
 
