@@ -42,6 +42,7 @@ spring:
             issuer-uri: http://127.0.0.1:9100
   cloud:
     gateway:
+     mvc:
       routes:
       - id: msvc-users
         uri: lb://msvc-users
@@ -71,7 +72,7 @@ spring:
             statusCodes: 500
             fallbackUri: forward:/api/items/5
         - StripPrefix=2
-        - CookieExampleFilter=user,Jose,Sample cookie added to response for products
+        #- CookieExampleFilter=user,Jose,Sample cookie added to response for products
       - id: msvc-items
         uri: lb://msvc-items
         predicates:

@@ -10,17 +10,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity.CorsSpec;
-import org.springframework.security.config.web.server.ServerHttpSecurity.OAuth2ResourceServerSpec.JwtSpec;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
-
-import reactor.core.publisher.Mono;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
@@ -29,33 +26,50 @@ public class SecurityConfig {
     private static final String ROLE_ADMIN = "ADMIN";
 
     @Bean
-    SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) throws Exception {
-        return http.authorizeExchange(authorize -> authorize
-                .pathMatchers("/authorized", "/logout").permitAll()
-                .pathMatchers(HttpMethod.GET, "/api/items", "/api/products", "/api/users").permitAll()
-                .pathMatchers(HttpMethod.GET, "/api/items/{id}", "/api/products/{id}", "/api/users/{id}")
+    SecurityFilterChain securityWebFilterChain(HttpSecurity http) throws Exception {
+        return http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/authorized", "/logout").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/items", "/api/products", "/api/users").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/items/{id}", "/api/products/{id}", "/api/users/{id}")
                 .hasAnyRole(ROLE_ADMIN, ROLE_USER)
-                .pathMatchers("/api/items/**", "/api/products/**", "/api/users/**").hasRole(ROLE_ADMIN)
-                .anyExchange().authenticated())
-                .cors(CorsSpec::disable)
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-                .oauth2Login(Customizer.withDefaults())
+                .requestMatchers("/api/items/**", "/api/products/**", "/api/users/**").hasRole(ROLE_ADMIN)
+                .anyRequest().authenticated())
+                .cors(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(login -> login.loginPage("/oauth2/authorization/client-app"))
                 .oauth2Client(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(this::jwtConverter))
                 .build();
     }
 
-    private JwtSpec jwtConverter(JwtSpec jwt) {
-        return jwt.jwtAuthenticationConverter(new Converter<Jwt, Mono<AbstractAuthenticationToken>>() {
+    private OAuth2ResourceServerConfigurer<HttpSecurity>.JwtConfigurer jwtConverter(
+            OAuth2ResourceServerConfigurer<HttpSecurity>.JwtConfigurer jwt) {
+        return jwt.jwtAuthenticationConverter(new Converter<Jwt, AbstractAuthenticationToken>() {
             @Override
             @Nullable
-            public Mono<AbstractAuthenticationToken> convert(Jwt source) {
+            public AbstractAuthenticationToken convert(Jwt source) {
                 Collection<GrantedAuthority> authorities = source.getClaimAsStringList("roles").stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-                return Mono.just(new JwtAuthenticationToken(source, authorities));
+                return new JwtAuthenticationToken(source, authorities);
             }
 
         });
     }
+
+    // private JwtSpec jwtConverter(JwtSpec jwt) {
+    // return jwt.jwtAuthenticationConverter(new Converter<Jwt,
+    // Mono<AbstractAuthenticationToken>>() {
+    // @Override
+    // @Nullable
+    // public Mono<AbstractAuthenticationToken> convert(Jwt source) {
+    // Collection<GrantedAuthority> authorities =
+    // source.getClaimAsStringList("roles").stream()
+    // .map(SimpleGrantedAuthority::new)
+    // .collect(Collectors.toList());
+    // return Mono.just(new JwtAuthenticationToken(source, authorities));
+    // }
+
+    // });
+    // }
 }
