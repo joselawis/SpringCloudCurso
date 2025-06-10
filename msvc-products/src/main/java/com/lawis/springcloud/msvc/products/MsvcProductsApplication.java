@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EntityScan({ "com.lawis.libs.msvc.commons.entities",
+@EntityScan({ "com.lawis.libs.msvc.entities.products",
 		"com.lawis.springcloud.msvc.products.entities" })
 public class MsvcProductsApplication {
 
