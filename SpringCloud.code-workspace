@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.dependency.packagePresentation": "hierarchical",
+		"java.compile.nullAnalysis.mode": "automatic",
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"java.referencesCodeLens.enabled": true,
+		"spring-boot.ls.java.home": "C:\\Program Files\\Amazon Corretto\\jdk21.0.7_6",
+		"java.jdt.ls.java.home": "C:\\Program Files\\Amazon Corretto\\jdk21.0.7_6",
+		"java.maven.downloadSources": true,
+		"java.implementationCodeLens": "all",
+	}
+}
