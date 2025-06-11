@@ -22,11 +22,6 @@ services:
       SONAR_JDBC_URL: jdbc:postgresql://sonarqube_db:5432/sonarqube
       # Si prefieres usar la base interna H2 para pruebas rápidas:
       # SONARQUBE_JDBC_URL: jdbc:h2:tcp://localhost:9092/sonarqube;MODE=PostgreSQL
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/api/system/health"]
-      interval: 15s
-      retries: 10
-      start_period: 300s
     depends_on:
       - sonarqube_db
     restart: unless-stopped
@@ -56,9 +51,6 @@ services:
       - RUNNER_WORKDIR
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # si el runner debe correr contenedores
-    depends_on:
-      sonarqube:
-        condition: service_healthy
     restart: unless-stopped
 
 volumes:

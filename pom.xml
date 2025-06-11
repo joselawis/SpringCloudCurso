@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.0</version>
+    <relativePath/>
+    <!-- lookup parent from repository -->
+  </parent>
+  <groupId>com.lawis.springcloud</groupId>
+  <artifactId>spring-cloud-course</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>eureka-server</module>
+    <module>config-server</module>
+    <module>msvc-gateway-server</module>
+    <module>libs-msvc-entities</module>
+    <module>libs-msvc-commons</module>
+    <module>msvc-productos</module>
+    <module>msvc-users</module>
+    <module>msvc-items</module>
+    <module>msvc-oauth</module>
+  </modules>
+
+  <properties>
+    <sonar.projectKey>springcloudcourse</sonar.projectKey>
+    <sonar.projectName>Spring Cloud Curso (Aggregate)</sonar.projectName>
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- configura el plugin sonar en el padre para no repetirlo -->
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>4.0.0.4121</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

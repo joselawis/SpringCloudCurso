@@ -33,9 +33,7 @@ jobs:
         run: |
           for dir in $(find . -name 'pom.xml' -exec dirname {} \;); do
             echo "🔍 Analizando módulo $dir"
-            mvn -f "$dir/pom.xml" clean verify sonar:sonar \
-              -Dsonar.projectKey=$(basename $dir) \
-              -Dsonar.projectName=$(basename $dir) \
-              -Dsonar.host.url=http://sonarqube:9000 \
-              -Dsonar.login=$SONAR_TOKEN
+            mvn clean verify sonar:sonar \
+              -Dsonar.login=$SONAR_TOKEN \
+              -DskipTests=false
           done
