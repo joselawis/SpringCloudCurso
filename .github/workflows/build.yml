@@ -1,0 +1,41 @@
+name: Multi-module Build & SonarQube Scan (Java 21)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-analyze:
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven' # cache de dependencias :contentReference[oaicite:3]{index=3}
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build and analyze all modules
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          for dir in $(find . -name 'pom.xml' -exec dirname {} \;); do
+            echo "🔍 Analizando módulo $dir"
+            mvn -f "$dir/pom.xml" clean verify sonar:sonar \
+              -Dsonar.projectKey=$(basename $dir) \
+              -Dsonar.projectName=$(basename $dir) \
+              -Dsonar.host.url=http://sonarqube:9000 \
+              -Dsonar.login=$SONAR_TOKEN
+          done

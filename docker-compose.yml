@@ -40,6 +40,21 @@ services:
       - sonarqube_db_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  github_runner:
+    build:
+      context: ./runner
+    container_name: github-runner
+    env_file:
+      - .env
+    environment:
+      - RUNNER_NAME
+      - RUNNER_REPO
+      - RUNNER_TOKEN
+      - RUNNER_WORKDIR
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # si el runner debe correr contenedores
+    restart: unless-stopped
+
 volumes:
   db_data:
   sonarqube_db_data:
