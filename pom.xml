@@ -29,7 +29,7 @@
   <properties>
     <sonar.projectKey>springcloudcourse</sonar.projectKey>
     <sonar.projectName>Spring Cloud Curso (Aggregate)</sonar.projectName>
-    <sonar.host.url>http://localhost:9000</sonar.host.url>
+    <sonar.host.url>http://sonarqube:9000</sonar.host.url>
   </properties>
 
   <build>
