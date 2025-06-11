@@ -20,7 +20,7 @@
     <module>msvc-gateway-server</module>
     <module>libs-msvc-entities</module>
     <module>libs-msvc-commons</module>
-    <module>msvc-productos</module>
+    <module>msvc-products</module>
     <module>msvc-users</module>
     <module>msvc-items</module>
     <module>msvc-oauth</module>
