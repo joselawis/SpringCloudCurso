@@ -25,6 +25,8 @@ services:
     depends_on:
       - sonarqube_db
     restart: unless-stopped
+    networks:
+      - backend
 
 
   sonarqube_db:
@@ -37,6 +39,8 @@ services:
     volumes:
       - sonarqube_db_data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - backend
 
   github_runner:
     build:
@@ -52,7 +56,16 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # si el runner debe correr contenedores
     restart: unless-stopped
+    depends_on:
+      - sonarqube
+    networks:
+      - frontend
+      - backend
 
 volumes:
   db_data:
   sonarqube_db_data:
+
+networks:
+  frontend:
+  backend:
