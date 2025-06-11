@@ -39,6 +39,9 @@ import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 @RestController
 public class ItemController {
 
+    private static final String DEFAULT_PRODUCT = "Default Product";
+    private static final String PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT = "Product doesn't exist in msvc-product";
+    private static final String MESSAGE = "message";
     private final Logger logger = LoggerFactory.getLogger(ItemController.class);
     private final ItemService service;
     private final CircuitBreakerFactory<?, ?> cBreakerFactory;
@@ -57,6 +60,7 @@ public class ItemController {
 
     @GetMapping("/fetch-configs")
     public ResponseEntity<Map<String, String>> fetchConfigs(@Value("${server.port}") String port) {
+        logger.info("Calling controller method ItemController::fetchConfigs()");
         Map<String, String> configs = new HashMap<>();
         configs.put("text", text);
         configs.put("port", port);
@@ -73,6 +77,7 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<Item>> list(@RequestParam(required = false) String name,
             @RequestHeader(name = "token-request", required = false) String token) {
+        logger.info("Calling controller method ItemController::list()");
         logger.info("Token from request header: {}", token);
         logger.info("Name from request parameter: {}", name);
         return ResponseEntity.ok(service.findAll());
@@ -80,13 +85,14 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> details(@PathVariable Long id) {
+        logger.info("Calling controller method ItemController::details() - id: {}", id);
         Optional<Item> itemOptional = cBreakerFactory.create("items").run(
                 () -> service.findById(id),
                 throwable -> {
                     logger.error(throwable.getMessage());
                     Product product = new Product();
                     product.setId(1L);
-                    product.setName("Default Product");
+                    product.setName(DEFAULT_PRODUCT);
                     product.setPrice(100.0);
                     product.setCreateAt(LocalDate.now());
                     return Optional.of(new Item(product, 5));
@@ -96,25 +102,27 @@ public class ItemController {
         }
         return ResponseEntity
                 .status(404)
-                .body(Collections.singletonMap("message", "Product doesn't exist in msvc-product"));
+                .body(Collections.singletonMap(MESSAGE, PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT));
     }
 
     @CircuitBreaker(name = "items", fallbackMethod = "getFallbackMethodProduct")
     @GetMapping("/details2/{id}")
     public ResponseEntity<?> details2(@PathVariable Long id) {
+        logger.info("Calling controller method ItemController::details2() - id: {}", id);
         Optional<Item> itemOptional = service.findById(id);
         if (itemOptional.isPresent()) {
             return ResponseEntity.ok(itemOptional.orElseThrow());
         }
         return ResponseEntity
                 .status(404)
-                .body(Collections.singletonMap("message", "Product doesn't exist in msvc-product"));
+                .body(Collections.singletonMap(MESSAGE, PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT));
     }
 
     @CircuitBreaker(name = "items", fallbackMethod = "getFallbackMethodProduct2")
     @TimeLimiter(name = "items")
     @GetMapping("/details3/{id}")
     public CompletableFuture<?> details3(@PathVariable Long id) {
+        logger.info("Calling controller method ItemController::details3() - id: {}", id);
         return CompletableFuture.supplyAsync(() -> {
             Optional<Item> itemOptional = service.findById(id);
             if (itemOptional.isPresent()) {
@@ -122,7 +130,7 @@ public class ItemController {
             }
             return ResponseEntity
                     .status(404)
-                    .body(Collections.singletonMap("message", "Product doesn't exist in msvc-product"));
+                    .body(Collections.singletonMap(MESSAGE, PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT));
         });
     }
 
@@ -131,7 +139,7 @@ public class ItemController {
         logger.error(e.getMessage());
         Product product = new Product();
         product.setId(1L);
-        product.setName("Default Product");
+        product.setName(DEFAULT_PRODUCT);
         product.setPrice(100.0);
         product.setCreateAt(LocalDate.now());
         return ResponseEntity.ok(new Item(product, 5));
@@ -143,7 +151,7 @@ public class ItemController {
             logger.error(e.getMessage());
             Product product = new Product();
             product.setId(1L);
-            product.setName("Default Product");
+            product.setName(DEFAULT_PRODUCT);
             product.setPrice(100.0);
             product.setCreateAt(LocalDate.now());
             return ResponseEntity.ok(new Item(product, 5));
@@ -153,13 +161,15 @@ public class ItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Product> create(@RequestBody Product product) {
+        logger.info("Calling controller method ItemController::create() - product: {}", product);
         return ResponseEntity.ok(service.save(product));
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Product> update(@RequestBody Product entity, @PathVariable Long id) {
-        return service.update(entity, id).map(
+    public ResponseEntity<Product> update(@RequestBody Product product, @PathVariable Long id) {
+        logger.info("Calling controller method ItemController::update() - id: {} product: {}", id, product);
+        return service.update(product, id).map(
                 updatedProduct -> ResponseEntity.status(HttpStatus.CREATED).body(updatedProduct))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -167,6 +177,7 @@ public class ItemController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
+        logger.info("Calling controller method ItemController::delete() - id: {}", id);
         return service.delete(id)
                 ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();

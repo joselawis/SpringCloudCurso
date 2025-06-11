@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,16 +19,18 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.lawis.libs.msvc.commons.models.User;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UsersService implements UserDetailsService {
+    private final Logger logger = LoggerFactory.getLogger(UsersService.class);
 
     private final WebClient.Builder client;
 
-    public UserService(Builder client) {
+    public UsersService(Builder client) {
         this.client = client;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        logger.info("Entering process of loging UsersService::loadUserByUsername() - username: {}", username);
         Map<String, String> params = new HashMap<>();
         params.put("username", username);
 
@@ -47,6 +51,7 @@ public class UserService implements UserDetailsService {
                     .map(role -> new SimpleGrantedAuthority(role.getName()))
                     .toList();
 
+            logger.info("Login Success - User found: {}", user.getUsername());
             return new org.springframework.security.core.userdetails.User(user.getUsername(),
                     user.getPassword(),
                     user.getEnabled(),
@@ -54,9 +59,10 @@ public class UserService implements UserDetailsService {
                     true,
                     true,
                     authorities);
-
         } catch (WebClientResponseException e) {
-            throw new UsernameNotFoundException("Error while trying to connect to the user service: " + e.getMessage());
+            String errorMessage = "Error while trying to login user " + username;
+            logger.error(errorMessage);
+            throw new UsernameNotFoundException(errorMessage, e);
         }
     }
 
