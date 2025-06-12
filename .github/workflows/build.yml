@@ -10,41 +10,38 @@ jobs:
     runs-on: [ self-hosted ]
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: http://sonarqube:9000
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug SONAR env vars
+      - name: Debug SONAR environment
+        if: ${{ failure() || always() }}
         run: |
-          echo "🔍 Vars de SONAR en el runner:"
-          if env | grep -q SONAR; then
-            env | grep SONAR
-          else
-            echo "  — Ninguna variable SONAR presente"
-          fi
+          echo "🔍 SONAR_TOKEN   = ${SONAR_TOKEN:0:4}****"
+          echo "🔍 SONAR_HOST_URL= ${SONAR_HOST_URL}"
 
-      - name: Setup JDK 21
+      - name: Verify SonarQube connectivity
+        # No debemos romper el build si Sonar está momentáneamente abajo
+        continue-on-error: true
+        run: |
+          echo "🔗 Probando conexión a SonarQube…"
+          curl --fail -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/server/version"
+
+      - name: Setup JDK 21 & cache Maven
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '21'
-          cache: 'maven' # cache de dependencias :contentReference[oaicite:3]{index=3}
+          cache: maven
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Build and analyze all modules (debug)
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Build & SonarQube analysis
         run: |
-          echo "🔍 Token en Maven: $SONAR_TOKEN"
-          mvn clean verify sonar:sonar \
-            -X \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.host.url=http://sonarqube:9000 \
-            -DskipTests=false
+          for dir in $(find . -name 'pom.xml' -exec dirname {} \;); do
+            echo "🔨 Módulo: $dir"
+            mvn -f "$dir/pom.xml" clean verify sonar:sonar \
+              -DskipTests=false \
+              -Dsonar.login="${SONAR_TOKEN}" \
+              -Dsonar.host.url="${SONAR_HOST_URL}"
+          done
