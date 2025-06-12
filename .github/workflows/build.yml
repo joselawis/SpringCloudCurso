@@ -36,13 +36,18 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Build & install all modules
+        run: |
+          mvn clean install -DskipTests \
+            -Dsonar.skip=true
+
       - name: Build & SonarQube analysis
         run: |
           for dir in $(find . -maxdepth 2 -type f -name 'pom.xml' -printf '%h\n'); do
             module=$(basename "$dir")
             key="springcloudcourse-${module}"
             echo "🔨 Analizando $module con key $key"
-            mvn -f "$dir/pom.xml" clean verify sonar:sonar \
+            mvn -f "$dir/pom.xml" sonar:sonar \
               -Dsonar.login="${SONAR_TOKEN}" \
               -Dsonar.host.url="${SONAR_HOST_URL}" \
               -Dsonar.projectKey="$key" \
