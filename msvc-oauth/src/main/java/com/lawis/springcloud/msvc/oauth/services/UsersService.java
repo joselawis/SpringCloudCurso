@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.Builder;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.lawis.libs.msvc.commons.models.User;
@@ -22,9 +21,9 @@ import com.lawis.libs.msvc.commons.models.User;
 public class UsersService implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(UsersService.class);
 
-    private final WebClient.Builder client;
+    private final WebClient client;
 
-    public UsersService(Builder client) {
+    public UsersService(WebClient client) {
         this.client = client;
     }
 
@@ -35,8 +34,7 @@ public class UsersService implements UserDetailsService {
         params.put("username", username);
 
         try {
-            User user = client.build()
-                    .get()
+            User user = client.get()
                     .uri("/username/{username}", params)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()

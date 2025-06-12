@@ -1,4 +1,4 @@
-package com.lawis.springcloud.msvc.items;
+package com.lawis.springcloud.msvc.oauth.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
@@ -9,19 +9,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    // @Bean
-    // @LoadBalanced
-    // WebClient.Builder webClient() {
-    // return WebClient.builder()
-    // .baseUrl(url);
-    // }
-
     @Bean
     WebClient webClient(WebClient.Builder webClientBuilder,
-            @Value("${config.baseurl.endpoint.msvc-products}") String url,
+            @Value("${config.baseurl.endpoint.msvc-users}") String url,
             ReactorLoadBalancerExchangeFilterFunction lbFunction) {
         return webClientBuilder.baseUrl(url)
                 .filter(lbFunction)
                 .build();
     }
+
 }
