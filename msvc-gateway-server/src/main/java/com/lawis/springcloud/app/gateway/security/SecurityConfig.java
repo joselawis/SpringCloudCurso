@@ -68,7 +68,6 @@ public class SecurityConfig {
     // .collect(Collectors.toList());
     // return Mono.just(new JwtAuthenticationToken(source, authorities));
     // }
-
     // });
     // }
 }
