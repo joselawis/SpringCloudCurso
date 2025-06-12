@@ -5,31 +5,18 @@ on:
     branches:
       - master
 
-jobs:
-  build-and-analyze:
-    runs-on: [ self-hosted ]
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_HOST_URL: http://sonarqube:9000
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  SONAR_HOST_URL: http://sonarqube:9000
 
+jobs:
+  build:
+    runs-on: [ self-hosted ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug SONAR environment
-        if: ${{ failure() || always() }}
-        run: |
-          echo "🔍 SONAR_TOKEN   = ${SONAR_TOKEN:0:4}****"
-          echo "🔍 SONAR_HOST_URL= ${SONAR_HOST_URL}"
-
-      - name: Verify SonarQube connectivity
-        # No debemos romper el build si Sonar está momentáneamente abajo
-        continue-on-error: true
-        run: |
-          echo "🔗 Probando conexión a SonarQube…"
-          curl --fail -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/server/version"
-
-      - name: Setup JDK 21 & cache Maven
+      - name: Setup JDK & Cache Maven
         uses: actions/setup-java@v3
         with:
           distribution: temurin
@@ -38,18 +25,51 @@ jobs:
 
       - name: Build & install all modules
         run: |
-          mvn clean install -DskipTests \
-            -Dsonar.skip=true
+          mvn clean install -DskipTests -Dsonar.skip=true
 
-      - name: Build & SonarQube analysis
+      - name: Cache local Maven repo
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+
+  sonar-analysis:
+    needs: build
+    runs-on: [ self-hosted ]
+    strategy:
+      matrix:
+        module:
+          - eureka-server
+          - config-server
+          - msvc-gateway-server
+          - libs-msvc-entities
+          - libs-msvc-commons
+          - msvc-products
+          - msvc-users
+          - msvc-items
+          - msvc-oauth
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Restore local Maven repo cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: SonarQube analysis for ${{ matrix.module }}
         run: |
-          for dir in $(find . -maxdepth 2 -type f -name 'pom.xml' -printf '%h\n'); do
-            module=$(basename "$dir")
-            key="springcloudcourse-${module}"
-            echo "🔨 Analizando $module con key $key"
-            mvn -f "$dir/pom.xml" sonar:sonar \
-              -Dsonar.login="${SONAR_TOKEN}" \
-              -Dsonar.host.url="${SONAR_HOST_URL}" \
-              -Dsonar.projectKey="$key" \
-              -Dsonar.projectName="$module"
-          done
+          mvn -f ${{ matrix.module }}/pom.xml sonar:sonar \
+            -DskipTests=true \
+            -Dsonar.login="${SONAR_TOKEN}" \
+            -Dsonar.host.url="${SONAR_HOST_URL}" \
+            -Dsonar.projectKey="springcloudcourse-${{ matrix.module }}" \
+            -Dsonar.projectName="${{ matrix.module }}"
