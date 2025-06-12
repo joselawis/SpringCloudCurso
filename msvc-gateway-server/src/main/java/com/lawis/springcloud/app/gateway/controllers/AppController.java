@@ -15,9 +15,7 @@ public class AppController {
     @GetMapping("/authorized")
     public Map<String, String> authorized(@RequestParam String code) {
         Map<String, String> map = new HashMap<>();
-
         map.put("code", code);
-
         return map;
     }
 
