@@ -38,11 +38,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Build and analyze all modules
+      - name: Build and analyze all modules (debug)
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          for dir in $(find . -name 'pom.xml' -exec dirname {} \;); do
-            echo "🔍 Analizando módulo $dir"
-            mvn clean verify sonar:sonar \
-              -Dsonar.login=$SONAR_TOKEN \
-              -DskipTests=false
-          done
+          echo "🔍 Token en Maven: $SONAR_TOKEN"
+          mvn clean verify sonar:sonar \
+            -X \
+            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.host.url=http://sonarqube:9000 \
+            -DskipTests=false
