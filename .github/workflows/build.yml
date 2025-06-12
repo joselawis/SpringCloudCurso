@@ -38,10 +38,13 @@ jobs:
 
       - name: Build & SonarQube analysis
         run: |
-          for dir in $(find . -name 'pom.xml' -exec dirname {} \;); do
-            echo "🔨 Módulo: $dir"
+          for dir in $(find . -maxdepth 2 -type f -name 'pom.xml' -printf '%h\n'); do
+            module=$(basename "$dir")
+            key="springcloudcourse-${module}"
+            echo "🔨 Analizando $module con key $key"
             mvn -f "$dir/pom.xml" clean verify sonar:sonar \
-              -DskipTests=false \
               -Dsonar.login="${SONAR_TOKEN}" \
-              -Dsonar.host.url="${SONAR_HOST_URL}"
+              -Dsonar.host.url="${SONAR_HOST_URL}" \
+              -Dsonar.projectKey="$key" \
+              -Dsonar.projectName="$module"
           done
