@@ -5,33 +5,32 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.Builder;
 
 import com.lawis.libs.msvc.commons.models.Product;
 import com.lawis.springcloud.msvc.items.models.Item;
 
-@Primary
 @Service
 public class ItemServiceWebClient implements ItemService {
 
-    private static final String PATH_VARIABLE_ID = "/{id}";
+    private final String pathVariableId;
 
-    private final WebClient.Builder client;
+    private final WebClient client;
 
     private Random random = new Random();
 
-    public ItemServiceWebClient(Builder client) {
+    public ItemServiceWebClient(WebClient client,
+            @Value("${itemservice.path-variable-id:/{id}}") String pathVariableId) {
         this.client = client;
+        this.pathVariableId = pathVariableId;
     }
 
     @Override
     public List<Item> findAll() {
-        return client.build()
-                .get()
+        return client.get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToFlux(Product.class)
@@ -43,10 +42,8 @@ public class ItemServiceWebClient implements ItemService {
     @Override
     public Optional<Item> findById(Long id) {
         Map<String, Object> params = Map.of("id", id);
-
-        return Optional.ofNullable(client.build()
-                .get()
-                .uri(PATH_VARIABLE_ID, params)
+        return Optional.ofNullable(client.get()
+                .uri(pathVariableId, params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Product.class)
@@ -56,8 +53,7 @@ public class ItemServiceWebClient implements ItemService {
 
     @Override
     public Product save(Product product) {
-        return client.build()
-                .post()
+        return client.post()
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(product)
@@ -69,10 +65,8 @@ public class ItemServiceWebClient implements ItemService {
     @Override
     public Optional<Product> update(Product product, Long id) {
         Map<String, Object> params = Map.of("id", id);
-
-        return Optional.ofNullable(client.build()
-                .put()
-                .uri(PATH_VARIABLE_ID, params)
+        return Optional.ofNullable(client.put()
+                .uri(pathVariableId, params)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(product)
@@ -84,10 +78,8 @@ public class ItemServiceWebClient implements ItemService {
     @Override
     public Boolean delete(Long id) {
         Map<String, Object> params = Map.of("id", id);
-
-        return client.build()
-                .delete()
-                .uri(PATH_VARIABLE_ID, params)
+        return client.delete()
+                .uri(pathVariableId, params)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Boolean.class)

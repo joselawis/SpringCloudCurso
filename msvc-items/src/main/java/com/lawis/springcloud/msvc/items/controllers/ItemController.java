@@ -84,7 +84,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> details(@PathVariable Long id) {
+    public ResponseEntity<Item> details(@PathVariable Long id) {
         logger.info("Calling controller method ItemController::details() - id: {}", id);
         Optional<Item> itemOptional = cBreakerFactory.create("items").run(
                 () -> service.findById(id),
@@ -102,12 +102,12 @@ public class ItemController {
         }
         return ResponseEntity
                 .status(404)
-                .body(Collections.singletonMap(MESSAGE, PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT));
+                .build();
     }
 
     @CircuitBreaker(name = "items", fallbackMethod = "getFallbackMethodProduct")
     @GetMapping("/details2/{id}")
-    public ResponseEntity<?> details2(@PathVariable Long id) {
+    public ResponseEntity<Item> details2(@PathVariable Long id) {
         logger.info("Calling controller method ItemController::details2() - id: {}", id);
         Optional<Item> itemOptional = service.findById(id);
         if (itemOptional.isPresent()) {
@@ -115,13 +115,13 @@ public class ItemController {
         }
         return ResponseEntity
                 .status(404)
-                .body(Collections.singletonMap(MESSAGE, PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT));
+                .build();
     }
 
     @CircuitBreaker(name = "items", fallbackMethod = "getFallbackMethodProduct2")
     @TimeLimiter(name = "items")
     @GetMapping("/details3/{id}")
-    public CompletableFuture<?> details3(@PathVariable Long id) {
+    public CompletableFuture<ResponseEntity<Object>> details3(@PathVariable Long id) {
         logger.info("Calling controller method ItemController::details3() - id: {}", id);
         return CompletableFuture.supplyAsync(() -> {
             Optional<Item> itemOptional = service.findById(id);
@@ -178,7 +178,7 @@ public class ItemController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
         logger.info("Calling controller method ItemController::delete() - id: {}", id);
-        return service.delete(id)
+        return Boolean.TRUE.equals(service.delete(id))
                 ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
