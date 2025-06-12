@@ -27,12 +27,6 @@ jobs:
         run: |
           mvn clean install -DskipTests -Dsonar.skip=true
 
-      - name: Cache local Maven repo
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-
   sonar-analysis:
     needs: build
     runs-on: [ self-hosted ]
@@ -53,21 +47,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Restore local Maven repo cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: '21'
 
+      - name: Verify SonarQube connectivity
+        continue-on-error: true
+        run: |
+          curl --fail -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/server/version"
+
       - name: SonarQube analysis for ${{ matrix.module }}
         run: |
-          mvn -f ${{ matrix.module }}/pom.xml sonar:sonar \
+          mvn -f ${{ matrix.module }}/pom.xml clean verify sonar:sonar \
             -DskipTests=true \
             -Dsonar.login="${SONAR_TOKEN}" \
             -Dsonar.host.url="${SONAR_HOST_URL}" \
