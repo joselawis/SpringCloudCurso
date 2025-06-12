@@ -53,7 +53,6 @@ public class SecurityConfig {
                         .collect(Collectors.toList());
                 return new JwtAuthenticationToken(source, authorities);
             }
-
         });
     }
 
