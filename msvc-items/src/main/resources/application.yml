@@ -18,3 +18,12 @@ resilience4j:
     instances:
       items:
         base-config: mycustomconfig
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus: {}

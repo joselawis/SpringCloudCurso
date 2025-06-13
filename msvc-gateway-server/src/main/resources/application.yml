@@ -84,3 +84,11 @@ spring:
         - AddRequestParameter=name, Jose
         - SetResponseHeader=Content-Type, text/plain
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus: {}
