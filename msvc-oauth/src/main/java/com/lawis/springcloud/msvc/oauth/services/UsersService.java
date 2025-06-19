@@ -17,14 +17,19 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.lawis.libs.msvc.commons.models.User;
 
+import io.micrometer.tracing.Tracer;
+
 @Service
 public class UsersService implements UserDetailsService {
     private final Logger logger = LoggerFactory.getLogger(UsersService.class);
 
     private final WebClient client;
 
-    public UsersService(WebClient client) {
+    private final Tracer tracer;
+
+    public UsersService(WebClient client, Tracer tracer) {
         this.client = client;
+        this.tracer = tracer;
     }
 
     @Override
@@ -50,6 +55,7 @@ public class UsersService implements UserDetailsService {
                     .toList();
 
             logger.info("Login Success - User found: {}", user.getUsername());
+            tracer.currentSpan().tag("success.login", "Login Success - User found: " + user.getUsername());
             return new org.springframework.security.core.userdetails.User(user.getUsername(),
                     user.getPassword(),
                     user.getEnabled(),
@@ -60,6 +66,7 @@ public class UsersService implements UserDetailsService {
         } catch (WebClientResponseException e) {
             String errorMessage = "Error while trying to login user " + username;
             logger.error(errorMessage);
+            tracer.currentSpan().tag("error.login.message", errorMessage + " - " + e.getMessage());
             throw new UsernameNotFoundException(errorMessage, e);
         }
     }
