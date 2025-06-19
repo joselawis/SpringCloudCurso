@@ -14,6 +14,7 @@ services:
   sonarqube:
     image: sonarqube:10-community   # o la versión LTS que prefieras
     container_name: sonarqube
+    restart: always
     ports:
       - "9000:9000"
     environment:
@@ -24,7 +25,6 @@ services:
       # SONARQUBE_JDBC_URL: jdbc:h2:tcp://localhost:9092/sonarqube;MODE=PostgreSQL
     depends_on:
       - sonarqube_db
-    restart: unless-stopped
     networks:
       - backend
 
@@ -32,13 +32,13 @@ services:
   sonarqube_db:
     image: postgres:14-alpine
     container_name: sonarqube-db
+    restart: always
     environment:
       POSTGRES_USER: sonarqube
       POSTGRES_PASSWORD: sonarqube
       POSTGRES_DB: sonarqube
     volumes:
       - sonarqube_db_data:/var/lib/postgresql/data
-    restart: unless-stopped
     networks:
       - backend
 
@@ -55,7 +55,7 @@ services:
       - RUNNER_WORKDIR
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # si el runner debe correr contenedores
-    restart: unless-stopped
+    restart: always
     depends_on:
       - sonarqube
     networks:
