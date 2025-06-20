@@ -1,0 +1,63 @@
+name: zipkin
+services:
+  cassandra:
+    image: cassandra:3.11.10
+    container_name: cassandra
+    ports:
+      - "9042:9042"  # Puerto para CQL
+    environment:
+      - CASSANDRA_CLUSTER_NAME=zipkin-cluster
+      - CASSANDRA_ENABLE_USER_DEFINED_FUNCTIONS=true
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    restart: always
+    networks:
+      - zipkin-net
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  zipkin:
+    image: openzipkin/zipkin:3.5.1
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=cassandra3
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_KEYSPACE=zipkin2
+      - CASSANDRA_ENSURE_SCHEMA=true
+    ports:
+      - 9411:9411
+    restart: always
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    networks:
+      - zipkin-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports: 
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - zipkin
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports: 
+      - 3000:3000
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+
+volumes:
+  cassandra_data:
+
+networks:
+  zipkin-net:
