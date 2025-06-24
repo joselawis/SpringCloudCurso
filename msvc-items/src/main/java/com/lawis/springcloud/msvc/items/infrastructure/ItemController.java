@@ -1,4 +1,4 @@
-package com.lawis.springcloud.msvc.items.controllers;
+package com.lawis.springcloud.msvc.items.infrastructure;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -29,8 +28,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lawis.libs.msvc.commons.models.Product;
-import com.lawis.springcloud.msvc.items.models.Item;
-import com.lawis.springcloud.msvc.items.services.ItemService;
+import com.lawis.springcloud.msvc.items.application.ItemInPort;
+import com.lawis.springcloud.msvc.items.domain.Item;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
@@ -43,7 +42,7 @@ public class ItemController {
     private static final String PRODUCT_DOESN_T_EXIST_IN_MSVC_PRODUCT = "Product doesn't exist in msvc-product";
     private static final String MESSAGE = "message";
     private final Logger logger = LoggerFactory.getLogger(ItemController.class);
-    private final ItemService service;
+    private final ItemInPort service;
     private final CircuitBreakerFactory<?, ?> cBreakerFactory;
 
     @Value("${configuration.text}")
@@ -51,7 +50,7 @@ public class ItemController {
 
     private final Environment env;
 
-    public ItemController(@Qualifier("itemServiceFeign") ItemService service,
+    public ItemController(ItemInPort service,
             CircuitBreakerFactory<?, ?> cBreakerFactory, Environment env) {
         this.service = service;
         this.cBreakerFactory = cBreakerFactory;

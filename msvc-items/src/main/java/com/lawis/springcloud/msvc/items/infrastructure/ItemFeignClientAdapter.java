@@ -1,39 +1,34 @@
-package com.lawis.springcloud.msvc.items.services;
+package com.lawis.springcloud.msvc.items.infrastructure;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import com.lawis.libs.msvc.commons.models.Product;
-import com.lawis.springcloud.msvc.items.clients.ProductFeignClient;
-import com.lawis.springcloud.msvc.items.models.Item;
+import com.lawis.springcloud.msvc.items.application.ProductOutPort;
 
 import feign.FeignException;
 
+@Primary
 @Service
-public class ItemServiceFeign implements ItemService {
+public class ItemFeignClientAdapter implements ProductOutPort {
 
     private final ProductFeignClient client;
 
-    private Random random = new Random();
-
-    public ItemServiceFeign(ProductFeignClient client) {
+    public ItemFeignClientAdapter(ProductFeignClient client) {
         this.client = client;
     }
 
     @Override
-    public List<Item> findAll() {
-        return client.findAll().stream()
-                .map(product -> new Item(product, random.nextInt(0, 10) + 1))
-                .toList();
+    public List<Product> findAll() {
+        return client.findAll();
     }
 
     @Override
-    public Optional<Item> findById(Long id) {
-        return client.details(id)
-                .map(product -> new Item(product, random.nextInt(0, 10) + 1));
+    public Optional<Product> findById(Long id) {
+        return client.details(id);
     }
 
     @Override

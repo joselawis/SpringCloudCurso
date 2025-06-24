@@ -1,4 +1,4 @@
-package com.lawis.springcloud.msvc.items.clients;
+package com.lawis.springcloud.msvc.items.infrastructure;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.lawis.springcloud.msvc.items.configuration;
+package com.lawis.springcloud.msvc.items.infrastructure.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
