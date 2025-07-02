@@ -13,6 +13,25 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - my_network
+
+  config-server:
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    container_name: config-server
+    restart: always
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/your-org/your-config-repo.git
+    networks:
+      - my_network
 
 volumes:
   db_data:
+
+networks:
+  my_network:
+    driver: bridge
