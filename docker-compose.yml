@@ -40,6 +40,119 @@ services:
     networks:
       - my_network
 
+  msvc-users:
+    build:
+      context: ./msvc-users
+      dockerfile: Dockerfile
+    container_name: msvc-users
+    restart: always
+    environment:
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: db_springboot_cloud
+      DB_USERNAME: root
+      DB_PASSWORD: sasa1234
+      EUREKA_URL: http://eureka-server:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    networks:
+      - my_network
+    depends_on:
+      - mysql
+      - eureka-server
+      - config-server
+
+  msvc-products:
+    build:
+      context: ./msvc-products
+      dockerfile: Dockerfile
+    container_name: msvc-products
+    restart: always
+    environment:
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: db_springboot_cloud
+      DB_USERNAME: root
+      DB_PASSWORD: sasa1234
+      EUREKA_URL: http://eureka-server:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    networks:
+      - my_network
+    depends_on:
+      - mysql
+      - eureka-server
+      - config-server
+
+  msvc-items:
+    build:
+      context: ./msvc-items
+      dockerfile: Dockerfile
+    container_name: msvc-items
+    ports:
+      - "8002:8002"
+    restart: always
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+      MSVC_PRODUCTS_URL: http://msvc-products
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    networks:
+      - my_network
+    depends_on:
+      - eureka-server
+      - config-server
+      - msvc-products
+
+  msvc-oauth:
+    build:
+      context: ./msvc-oauth
+      dockerfile: Dockerfile
+    container_name: msvc-oauth
+    restart: always
+    ports:
+      - "9100:9100"
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+      MSVC_USERS_URL: http://msvc-users
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    networks:
+      - my_network
+    depends_on:
+      - eureka-server
+      - config-server
+      - msvc-users
+
+  msvc-gateway-server:
+    build:
+      context: ./msvc-gateway-server
+      dockerfile: Dockerfile
+    container_name: msvc-gateway-server
+    restart: always
+    ports:
+      - "8090:8090"
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+      OAUTH_ISSUER_URI: http://msvc-oauth:9100
+      OAUTH_REDIRECT_URI: http://localhost:8090/authorized
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    networks:
+      - my_network
+    depends_on:
+      - eureka-server
+      - config-server
+      - msvc-users
+      - msvc-products
+      - msvc-items
+      - msvc-oauth
+
 volumes:
   db_data:
 
