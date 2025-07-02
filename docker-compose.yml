@@ -25,7 +25,7 @@ services:
     ports:
       - "8888:8888"
     environment:
-      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/your-org/your-config-repo.git
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/joselawis/SpringCloudCursoConfigs.git
     networks:
       - my_network
 
