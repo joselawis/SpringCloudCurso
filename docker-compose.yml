@@ -2,14 +2,14 @@ name: springcloudcourse
 
 services:
   mysql:
-    image: mysql:8.3.0
+    image: mysql:latest
     container_name: mysql-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: sasa1234
       MYSQL_DATABASE: db_springboot_cloud
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -26,6 +26,17 @@ services:
       - "8888:8888"
     environment:
       SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/joselawis/SpringCloudCursoConfigs.git
+    networks:
+      - my_network
+    
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    restart: always
+    ports:
+      - "8761:8761"
     networks:
       - my_network
 
