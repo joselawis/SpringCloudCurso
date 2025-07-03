@@ -15,15 +15,8 @@
   <version>1.0.0</version>
   <packaging>pom</packaging>
   <modules>
-    <module>eureka-server</module>
-    <module>config-server</module>
-    <module>msvc-gateway-server</module>
-    <module>libs-msvc-entities</module>
-    <module>libs-msvc-commons</module>
-    <module>msvc-products</module>
-    <module>msvc-users</module>
-    <module>msvc-items</module>
-    <module>msvc-oauth</module>
+    <!-- Solo mantenemos este POM para propósitos de agregación opcional -->
+    <!-- Cada microservicio ahora es completamente independiente -->
   </modules>
 
   <properties>

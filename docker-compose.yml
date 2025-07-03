@@ -42,8 +42,8 @@ services:
 
   msvc-users:
     build:
-      context: ./msvc-users
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./msvc-users/Dockerfile
     container_name: msvc-users
     restart: always
     environment:
@@ -65,8 +65,8 @@ services:
 
   msvc-products:
     build:
-      context: ./msvc-products
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./msvc-products/Dockerfile
     container_name: msvc-products
     restart: always
     environment:
@@ -88,8 +88,8 @@ services:
 
   msvc-items:
     build:
-      context: ./msvc-items
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./msvc-items/Dockerfile
     container_name: msvc-items
     ports:
       - "8002:8002"
@@ -109,8 +109,8 @@ services:
 
   msvc-oauth:
     build:
-      context: ./msvc-oauth
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./msvc-oauth/Dockerfile
     container_name: msvc-oauth
     restart: always
     ports:
@@ -130,8 +130,8 @@ services:
 
   msvc-gateway-server:
     build:
-      context: ./msvc-gateway-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./msvc-gateway-server/Dockerfile
     container_name: msvc-gateway-server
     restart: always
     ports:
