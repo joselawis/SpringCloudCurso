@@ -76,6 +76,8 @@ services:
       DB_PASSWORD: sasa1234
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
+    deploy:
+      replicas: 3
     networks:
       - my_network
     depends_on:
