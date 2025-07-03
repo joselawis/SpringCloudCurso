@@ -17,9 +17,7 @@ services:
       - my_network
 
   config-server:
-    build:
-      context: .
-      dockerfile: ./config-server/Dockerfile
+    image: joselawis/config-server:1.0
     container_name: config-server
     restart: always
     ports:
@@ -30,9 +28,7 @@ services:
       - my_network
     
   eureka-server:
-    build:
-      context: .
-      dockerfile: ./eureka-server/Dockerfile
+    image: joselawis/eureka-server:1.0
     container_name: eureka-server
     restart: always
     ports:
@@ -41,9 +37,7 @@ services:
       - my_network
 
   msvc-users:
-    build:
-      context: .
-      dockerfile: ./msvc-users/Dockerfile
+    image: joselawis/msvc-users:1.0
     # container_name: msvc-users (comentado para permitir escalado)
     restart: always
     environment:
@@ -62,9 +56,7 @@ services:
       - config-server
 
   msvc-products:
-    build:
-      context: .
-      dockerfile: ./msvc-products/Dockerfile
+    image: joselawis/msvc-products:1.0
     # Comentar container_name para permitir escalado
     # container_name: msvc-products
     restart: always
@@ -77,6 +69,7 @@ services:
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
     deploy:
+      mode: replicated
       replicas: 3
     networks:
       - my_network
@@ -86,9 +79,7 @@ services:
       - config-server
 
   msvc-items:
-    build:
-      context: .
-      dockerfile: ./msvc-items/Dockerfile
+    image: joselawis/msvc-items:1.0
     # container_name: msvc-items (comentado para permitir escalado)
     # ports: # Comentado para permitir escalado (solo acceso via Gateway)
     #   - "8002:8002"
@@ -105,13 +96,11 @@ services:
       - msvc-products
 
   msvc-oauth:
-    build:
-      context: .
-      dockerfile: ./msvc-oauth/Dockerfile
-    # container_name: msvc-oauth (comentado para permitir escalado)
+    image: joselawis/msvc-oauth:1.0
+    container_name: msvc-oauth
     restart: always
-    # ports: # Comentado para permitir escalado (solo acceso via Gateway)
-    #   - "9100:9100"
+    ports: 
+      - "9100:9100"
     environment:
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
@@ -124,9 +113,7 @@ services:
       - msvc-users
 
   msvc-gateway-server:
-    build:
-      context: .
-      dockerfile: ./msvc-gateway-server/Dockerfile
+    image: joselawis/msvc-gateway-server:1.0
     container_name: msvc-gateway-server
     restart: always
     ports:
