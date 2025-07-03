@@ -18,8 +18,8 @@ services:
 
   config-server:
     build:
-      context: ./config-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./config-server/Dockerfile
     container_name: config-server
     restart: always
     ports:
@@ -31,8 +31,8 @@ services:
     
   eureka-server:
     build:
-      context: ./eureka-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./eureka-server/Dockerfile
     container_name: eureka-server
     restart: always
     ports:
@@ -54,8 +54,6 @@ services:
       DB_PASSWORD: sasa1234
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
-      ZIPKIN_ENABLED: true
-      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     networks:
       - my_network
     depends_on:
@@ -77,8 +75,6 @@ services:
       DB_PASSWORD: sasa1234
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
-      ZIPKIN_ENABLED: true
-      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     networks:
       - my_network
     depends_on:
@@ -98,8 +94,6 @@ services:
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
       MSVC_PRODUCTS_URL: http://msvc-products
-      ZIPKIN_ENABLED: true
-      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     networks:
       - my_network
     depends_on:
@@ -119,8 +113,6 @@ services:
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
       MSVC_USERS_URL: http://msvc-users
-      ZIPKIN_ENABLED: true
-      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     networks:
       - my_network
     depends_on:
@@ -141,8 +133,6 @@ services:
       CONFIG_SERVER_URL: http://config-server:8888
       OAUTH_ISSUER_URI: http://msvc-oauth:9100
       OAUTH_REDIRECT_URI: http://localhost:8090/authorized
-      ZIPKIN_ENABLED: true
-      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
     networks:
       - my_network
     depends_on:

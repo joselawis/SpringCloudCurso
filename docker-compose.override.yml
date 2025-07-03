@@ -1,0 +1,89 @@
+# docker-compose.override.yml - Se aplicará automáticamente
+version: '3.8'
+
+services:
+  cassandra:
+    image: cassandra:3.11.10
+    container_name: cassandra
+    ports:
+      - "9042:9042"  # Puerto para CQL
+    environment:
+      - CASSANDRA_CLUSTER_NAME=zipkin-cluster
+      - CASSANDRA_ENABLE_USER_DEFINED_FUNCTIONS=true
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    restart: always
+    networks:
+      - zipkin-net
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  # Agregar Zipkin al stack principal
+  zipkin:
+    image: openzipkin/zipkin:3.5.1
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=cassandra3
+      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_KEYSPACE=zipkin2
+      - CASSANDRA_ENSURE_SCHEMA=true
+    ports:
+      - "9411:9411"
+    networks:
+      - my_network
+      - zipkin-net
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    restart: always
+
+  # Override para habilitar Zipkin en todos los servicios
+  msvc-users:
+    environment:
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      zipkin:
+        condition: service_started
+
+  msvc-products:
+    environment:
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      zipkin:
+        condition: service_started
+
+  msvc-items:
+    environment:
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      zipkin:
+        condition: service_started
+
+  msvc-oauth:
+    environment:
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      zipkin:
+        condition: service_started
+
+  msvc-gateway-server:
+    environment:
+      ZIPKIN_ENABLED: true
+      ZIPKIN_URL: http://zipkin:9411/api/v2/spans
+    depends_on:
+      zipkin:
+        condition: service_started
+
+volumes:
+  cassandra_data:
+
+networks:
+  zipkin-net:
+    driver: bridge
