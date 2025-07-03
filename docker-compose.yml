@@ -44,7 +44,7 @@ services:
     build:
       context: .
       dockerfile: ./msvc-users/Dockerfile
-    container_name: msvc-users
+    # container_name: msvc-users (comentado para permitir escalado)
     restart: always
     environment:
       DB_HOST: mysql-db
@@ -65,7 +65,8 @@ services:
     build:
       context: .
       dockerfile: ./msvc-products/Dockerfile
-    container_name: msvc-products
+    # Comentar container_name para permitir escalado
+    # container_name: msvc-products
     restart: always
     environment:
       DB_HOST: mysql-db
@@ -86,9 +87,9 @@ services:
     build:
       context: .
       dockerfile: ./msvc-items/Dockerfile
-    container_name: msvc-items
-    ports:
-      - "8002:8002"
+    # container_name: msvc-items (comentado para permitir escalado)
+    # ports: # Comentado para permitir escalado (solo acceso via Gateway)
+    #   - "8002:8002"
     restart: always
     environment:
       EUREKA_URL: http://eureka-server:8761/eureka
@@ -105,10 +106,10 @@ services:
     build:
       context: .
       dockerfile: ./msvc-oauth/Dockerfile
-    container_name: msvc-oauth
+    # container_name: msvc-oauth (comentado para permitir escalado)
     restart: always
-    ports:
-      - "9100:9100"
+    # ports: # Comentado para permitir escalado (solo acceso via Gateway)
+    #   - "9100:9100"
     environment:
       EUREKA_URL: http://eureka-server:8761/eureka
       CONFIG_SERVER_URL: http://config-server:8888
